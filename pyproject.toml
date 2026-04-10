@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "pagefold"
+version = "0.1.0"
+description = "Download articles and images as markdown folders"
+authors = ["Andrei Ghiuru"]
+packages = [{include = "pagefold", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+newspaper4k = "^0.9.5"
+requests = "^2.33.1"
+playwright = "^1.58.0"
+trafilatura = "^2.0.0"
+
+
+[tool.poetry.scripts]
+pagefold = "pagefold:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

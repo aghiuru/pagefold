@@ -1,0 +1,4 @@
+{
+  "test_command": "poetry run python tests/run_tests.py",
+  "src_dirs": ["src", "tests"]
+}
