@@ -173,12 +173,16 @@ def scrape(url: str, output_dir: Path) -> None:
 
     saved = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
-    lines = [f"# {title}", ""]
+    fm = {"title": title, "source": url, "saved": saved}
     if authors:
-        lines += [f"**Authors:** {authors}", ""]
+        fm["authors"] = authors
     if date:
-        lines += [f"**Published:** {date}", ""]
-    lines += [f"**Source:** {url}", "", f"**Saved:** {saved}", "", "---", "", text, ""]
+        fm["published"] = date
+
+    lines = ["---"]
+    for k, v in fm.items():
+        lines.append(f"{k}: {v}")
+    lines += ["---", "", f"# {title}", "", text, ""]
 
     md_path = folder / f"{folder.name}.md"
     md_path.write_text("\n".join(lines), encoding="utf-8")
