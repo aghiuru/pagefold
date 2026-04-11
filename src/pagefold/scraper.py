@@ -4,6 +4,7 @@
 import sys
 import re
 import hashlib
+from datetime import datetime, timezone
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from urllib.parse import urlparse, urljoin
@@ -170,12 +171,14 @@ def scrape(url: str, output_dir: Path) -> None:
         if browser_context:
             browser_context.browser.close()
 
+    saved = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
     lines = [f"# {title}", ""]
     if authors:
         lines += [f"**Authors:** {authors}", ""]
     if date:
         lines += [f"**Published:** {date}", ""]
-    lines += [f"**Source:** {url}", "", "---", "", text, ""]
+    lines += [f"**Source:** {url}", "", f"**Saved:** {saved}", "", "---", "", text, ""]
 
     md_path = folder / f"{folder.name}.md"
     md_path.write_text("\n".join(lines), encoding="utf-8")
