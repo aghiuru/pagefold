@@ -186,13 +186,30 @@ def scrape(url: str, output_dir: Path) -> None:
 
 
 def main() -> None:
-    if len(sys.argv) < 2:
-        print("Usage: pagefold <url> [output_dir]")
-        sys.exit(1)
+    import argparse
 
-    url = sys.argv[1]
-    output_dir = Path(sys.argv[2]) if len(sys.argv) > 2 else Path("output")
-    scrape(url, output_dir)
+    parser = argparse.ArgumentParser(
+        description=(
+            "Download an article and its images into a self-contained folder.\n"
+            "\n"
+            "Creates OUTPUT_DIR/<article-slug>/ containing:\n"
+            "  <slug>.md   — article text in Markdown with a metadata header\n"
+            "  images/     — all images referenced in the article\n"
+            "\n"
+            "JavaScript-heavy pages are rendered with a headless browser automatically."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument("url", help="URL of the article to scrape")
+    parser.add_argument(
+        "--output-dir",
+        default="output",
+        metavar="DIR",
+        help="directory where the article folder is created (default: ./output)",
+    )
+    args = parser.parse_args()
+
+    scrape(args.url, Path(args.output_dir))
 
 
 if __name__ == "__main__":
