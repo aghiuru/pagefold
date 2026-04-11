@@ -26,12 +26,10 @@ The markdown file includes the title, author, publication date, source URL, and 
 
 ## Installation
 
-Requires Python 3.11+ and [Poetry](https://python-poetry.org/).
+Requires Python 3.11+ and [pipx](https://pipx.pypa.io/).
 
 ```bash
-git clone <repo>
-cd pagefold
-poetry install
+pipx install git+https://github.com/aghiuru/pagefold.git
 ```
 
 ## Usage
