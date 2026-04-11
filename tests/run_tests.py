@@ -20,7 +20,7 @@ BASELINE_DIR = TESTS_DIR / "baseline"
 
 def scrape(url: str, out_dir: Path) -> Path | None:
     result = subprocess.run(
-        ["poetry", "run", "pagefold", url, str(out_dir)],
+        ["poetry", "run", "pagefold", url, "--output-dir", str(out_dir)],
         capture_output=True, text=True
     )
     if result.returncode != 0:
@@ -36,7 +36,7 @@ def strip_volatile(text: str) -> str:
     """Remove lines that change every run (timestamps, byte counts)."""
     lines = []
     for line in text.splitlines():
-        if line.startswith("**Published:**"):
+        if line.startswith("saved:"):
             continue
         lines.append(line)
     return "\n".join(lines)

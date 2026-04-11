@@ -1,11 +1,11 @@
-# Production-Aware RL: How Agents Learn From Failures
-
-**Authors:** Arc Intelligence; Arc Research Team
-
-
-**Source:** https://www.arc.computer/blog/production-aware-RL
-
 ---
+title: Production-Aware RL: How Agents Learn From Failures
+source: https://www.arc.computer/blog/production-aware-RL
+authors: Arc Intelligence; Arc Research Team
+published: 2025-06-23
+---
+
+# Production-Aware RL: How Agents Learn From Failures
 
 **June 23, 2025**
 

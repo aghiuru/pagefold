@@ -1,11 +1,11 @@
-# $18B in pharma deals and AI 40% trade growth
-
-**Authors:** Chamath Palihapitiya
-
-
-**Source:** https://chamath.substack.com/p/what-i-read-this-week-178
-
 ---
+title: $18B in pharma deals and AI 40% trade growth
+source: https://chamath.substack.com/p/what-i-read-this-week-178
+authors: Chamath Palihapitiya
+published: 2026-04-05
+---
+
+# $18B in pharma deals and AI 40% trade growth
 
 ### A summary of the interesting content that I consumed this past week…
 

@@ -1,11 +1,11 @@
-# Eli Lilly to Acquire Centessa
-
-**Authors:** Pipeline Review
-
-
-**Source:** https://pipelinereview.substack.com/p/eli-lilly-to-acquire-centessa
-
 ---
+title: Eli Lilly to Acquire Centessa
+source: https://pipelinereview.substack.com/p/eli-lilly-to-acquire-centessa
+authors: Pipeline Review
+published: 2026-04-05
+---
+
+# Eli Lilly to Acquire Centessa
 
 ### Rise of selective OX2 agonists for narcolepsy
 

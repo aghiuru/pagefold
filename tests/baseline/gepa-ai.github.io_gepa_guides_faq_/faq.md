@@ -1,9 +1,10 @@
-# FAQ
-
-
-**Source:** https://gepa-ai.github.io/gepa/guides/faq/
-
 ---
+title: FAQ
+source: https://gepa-ai.github.io/gepa/guides/faq/
+published: 2025-05-14
+---
+
+# FAQ
 
 Common questions about GEPA, answered by the community and the GEPA team.
 

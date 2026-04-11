@@ -1,11 +1,11 @@
-# The UK is cutting its aid budget to the lowest level in decades
-
-**Authors:** Hannah Ritchie
-
-
-**Source:** https://hannahritchie.substack.com/p/uk-aid-budget-cuts
-
 ---
+title: The UK is cutting its aid budget to the lowest level in decades
+source: https://hannahritchie.substack.com/p/uk-aid-budget-cuts
+authors: Hannah Ritchie
+published: 2026-04-01
+---
+
+# The UK is cutting its aid budget to the lowest level in decades
 
 ### After pledging to increase the budget to 0.7% of GNI, the government is cutting it to 0.3%.
 

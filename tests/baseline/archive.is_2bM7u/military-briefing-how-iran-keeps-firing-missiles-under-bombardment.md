@@ -1,9 +1,10 @@
-# Military briefing: How Iran keeps firing missiles under bombardment
-
-
-**Source:** https://archive.is/2bM7u
-
 ---
+title: Military briefing: How Iran keeps firing missiles under bombardment
+source: https://archive.is/2bM7u
+published: 2026-04-05
+---
+
+# Military briefing: How Iran keeps firing missiles under bombardment
 
 Iran is waging its missile campaign against Israel and the Gulf states under conditions that would normally incapacitate a modern military.
 
