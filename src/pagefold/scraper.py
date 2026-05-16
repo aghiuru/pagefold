@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Download an article and its images as a folder with a markdown file."""
 
+import asyncio
 import sys
 import re
 import hashlib
@@ -13,6 +14,7 @@ import requests
 import trafilatura
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright, BrowserContext
+from playwright.async_api import async_playwright, BrowserContext as AsyncBrowserContext
 
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
@@ -107,6 +109,126 @@ def fetch_html(url: str) -> tuple[str, BrowserContext | None]:
     html = page.content()
     # Return the context so its cookies/TLS fingerprint can be reused for image downloads
     return html, context
+
+
+async def download_image_via_browser_async(url: str, dest: Path, context: AsyncBrowserContext) -> tuple[str, str] | tuple[str, None]:
+    try:
+        resp = await context.request.get(url)
+        if not resp.ok:
+            raise Exception(f"HTTP {resp.status}")
+        ext = _extract_image_metadata(url, resp.headers.get("content-type", ""))
+        return url, _save_image_file(url, dest, ext, await resp.body())
+    except Exception as e:
+        print(f"  [warn] failed to download {url}: {e}", file=sys.stderr)
+        return url, None
+
+
+async def fetch_html_async(url: str) -> tuple[str, AsyncBrowserContext | None]:
+    html = trafilatura.fetch_url(url)
+    if html and trafilatura.extract(html):
+        return html, None
+
+    print("  [info] JS-rendered page detected, using headless browser...")
+    playwright = await async_playwright().start()
+    browser = await playwright.chromium.launch()
+    context = await browser.new_context(user_agent=USER_AGENT)
+    page = await context.new_page()
+    await page.goto(url, wait_until="networkidle", timeout=30000)
+    for selector in ["button:has-text('Accept')", "button:has-text('Accept all')", "button:has-text('I agree')"]:
+        btn = await page.query_selector(selector)
+        if btn:
+            await btn.click()
+            await page.wait_for_load_state("networkidle", timeout=10000)
+            break
+    try:
+        await page.wait_for_selector("article, .post-content, .body, main", timeout=10000)
+    except Exception:
+        pass
+    html = await page.content()
+    return html, context
+
+
+async def download_images_async(text: str, base_url: str, images_dir: Path, browser_context: AsyncBrowserContext | None = None) -> tuple[str, int]:
+    """Download images referenced in markdown, return text with local paths."""
+    img_urls = [urljoin(base_url, u) for u in dict.fromkeys(re.findall(r'!\[.*?\]\((.*?)\)', text))]
+
+    print(f"Downloading {len(img_urls)} image(s)...")
+    image_map: dict[str, str] = {}
+
+    if browser_context:
+        for url in img_urls:
+            orig_url, name = await download_image_via_browser_async(url, images_dir, browser_context)
+            if name:
+                image_map[orig_url] = f"images/{name}"
+    else:
+        parsed = urlparse(base_url)
+        with requests.Session() as session:
+            session.headers["User-Agent"] = USER_AGENT
+            session.headers["Referer"] = base_url
+            session.headers["Origin"] = f"{parsed.scheme}://{parsed.netloc}"
+            results = await asyncio.gather(*[
+                asyncio.to_thread(download_image, u, images_dir, session) for u in img_urls
+            ])
+            for orig_url, name in results:
+                if name:
+                    image_map[orig_url] = f"images/{name}"
+
+    def replace(m: re.Match) -> str:
+        return f"![{m.group(1)}]({image_map.get(urljoin(base_url, m.group(2)), m.group(2))})"
+
+    return re.sub(r'!\[(.*?)\]\((.*?)\)', replace, text), len(image_map)
+
+
+async def scrape_async(url: str, output_dir: Path) -> None:
+    print(f"Fetching: {url}")
+    html, browser_context = await fetch_html_async(url)
+    html = inline_figures(html, url)
+
+    meta = trafilatura.extract_metadata(html, default_url=url)
+    text = trafilatura.extract(
+        html,
+        output_format="markdown",
+        include_formatting=True,
+        include_comments=False,
+        include_links=False,
+        include_images=True,
+    ) or ""
+    if text.startswith("# "):
+        text = text.split("\n", 1)[1].lstrip("\n")
+
+    title = (meta.title if meta else None) or urlparse(url).netloc
+    authors = meta.author if meta else None
+    date = meta.date if meta else None
+
+    folder = output_dir / (slugify(title) or "article")
+    images_dir = folder / "images"
+    images_dir.mkdir(parents=True, exist_ok=True)
+
+    try:
+        text, n_images = await download_images_async(text, url, images_dir, browser_context)
+    finally:
+        if browser_context:
+            await browser_context.browser.close()
+
+    saved = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
+    fm = {"title": title, "source": url, "saved": saved}
+    if authors:
+        fm["authors"] = authors
+    if date:
+        fm["published"] = date
+
+    lines = ["---"]
+    for k, v in fm.items():
+        lines.append(f"{k}: {v}")
+    lines += ["---", "", f"# {title}", "", text, ""]
+
+    md_path = folder / f"{folder.name}.md"
+    md_path.write_text("\n".join(lines), encoding="utf-8")
+
+    print(f"Saved to: {folder}/")
+    print(f"  {md_path.name} ({md_path.stat().st_size} bytes)")
+    print(f"  {n_images} image(s) in images/")
 
 
 def download_images(text: str, base_url: str, images_dir: Path, browser_context: BrowserContext | None = None) -> tuple[str, int]:
