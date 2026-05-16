@@ -14,8 +14,8 @@ import requests
 import trafilatura
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright, BrowserContext
-from playwright.async_api import async_playwright, BrowserContext as AsyncBrowserContext, Page
-from playwright_stealth import stealth_async
+from playwright.async_api import async_playwright, BrowserContext as AsyncBrowserContext
+from playwright_stealth import Stealth
 
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
@@ -130,11 +130,10 @@ async def fetch_html_async(url: str) -> tuple[str, AsyncBrowserContext | None]:
         return html, None
 
     print("  [info] JS-rendered page detected, using headless browser...")
-    playwright = await async_playwright().start()
+    playwright = await Stealth().use_async(async_playwright()).start()
     browser = await playwright.chromium.launch()
     context = await browser.new_context(user_agent=USER_AGENT)
     page = await context.new_page()
-    await stealth_async(page)
     await page.goto(url, wait_until="networkidle", timeout=30000)
     for selector in ["button:has-text('Accept')", "button:has-text('Accept all')", "button:has-text('I agree')"]:
         btn = await page.query_selector(selector)
